@@ -1,6 +1,6 @@
 var etcdcluster = require('./')
 
-
+var etcdjs = require('etcdjs')
 var async = require('async')
 var wrench = require('wrench')
 var spawn = require('child_process').spawn
@@ -54,4 +54,60 @@ tape('configs with overrides', function(t){
 
   t.end()
 
+})
+
+var maincluster = etcdcluster()
+
+tape('boot the cluster', function(t){
+  maincluster.start(function(err){
+    if(err){
+      t.fail(err, 'boot the cluster')
+    }
+    else{
+      t.pass('boot the cluster')
+    }
+    t.end()
+  })
+})
+
+
+tape('write a value to one server and read it from another', function(t){
+  async.series([
+
+    function(next){
+      var client1 = etcdjs(maincluster.addr(0))
+
+      client1.set('/test', 'hello world', function(err, node){
+        if(err) return next(err)
+        setTimeout(next, 1000)
+      })
+    },
+
+    function(next){
+      var client2 = etcdjs(maincluster.addr(1))
+      client2.get('/test', function(err, result){
+        if(err) return next(err)
+        t.equal(result.node.value, 'hello world', 'the value was read from the database')
+        next()
+      })
+    }
+
+  ], function(err){
+    if(err){
+      t.fail(err, 'no errors')
+    }
+    t.end()
+  })
+})
+
+tape('stop the cluster', function(t){
+  maincluster.stop(function(err){
+    if(err){
+      t.fail(err, 'stop the cluster')
+    }
+    else{
+      t.pass('stop the cluster')
+    }
+    t.end()
+  })
 })

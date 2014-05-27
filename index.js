@@ -68,6 +68,11 @@ Cluster.prototype.opts = function(index){
   return opts
 }
 
+Cluster.prototype.addr = function(index){
+  var config = this.opts(index)
+  return '127.0.0.1:' + config.port
+}
+
 Cluster.prototype.configs = function(){
   var servers = []
   for(var i=0; i<this._opts.count; i++){
@@ -78,13 +83,18 @@ Cluster.prototype.configs = function(){
 
 Cluster.prototype.start = function(done){
   var self = this;
+
   var serverConfigs = this.configs()
-  if(!fs.existsSync(opts.folder)){
-    wrench.mkdirSyncRecursive(opts.folder)
+  if(!fs.existsSync(this._opts.folder)){
+    wrench.mkdirSyncRecursive(this._opts.folder)
+  }
+  else{
+    wrench.rmdirSyncRecursive(self._opts.folder, true)  
   }
   async.forEachSeries(serverConfigs, function(config, next){
     var server = getServerProcess(config)
     self._servers['server' + config.index] = server
+    setTimeout(next, 500)
   }, done)
 }
 
@@ -93,9 +103,10 @@ Cluster.prototype.stop = function(done){
   var ids = Object.keys(this._servers)
   async.forEachSeries(ids, function(id, next){
     self._servers[id].kill('SIGTERM')
-    setTimeout(next, 200)
+    delete(self._servers[id])
+    setTimeout(next, 500)
   }, function(){
-    wrench.rmdirSyncRecursive(self._opts.folder)
+    wrench.rmdirSyncRecursive(self._opts.folder, true)
     done()
   })
 }
@@ -115,5 +126,8 @@ module.exports = function(opts){
       opts[key] = defaults[key]
     }
   })
-  return new Cluster(opts)
+  var cluster = new Cluster(opts)
+
+
+  return cluster
 }

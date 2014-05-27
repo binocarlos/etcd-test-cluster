@@ -42,7 +42,7 @@ tape('write a value to one server and read it from another', function(t){
 
 			client1.set('/test', 'hello world', function(err){
 				if(err) return next(err)
-				next()
+				setTimeout(next, 1000)
 			})
 		},
 
@@ -76,6 +76,14 @@ tape('stop the cluster', function(t){
 	})
 })
 ```
+
+NOTE - until I find a way to catch errors and close down gracefully - if there is a fatal error in the test script you need to run:
+
+```
+$ sudo killall etcd
+```
+
+Once the script has died
 
 ## api
 

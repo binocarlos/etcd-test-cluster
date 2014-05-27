@@ -26,6 +26,7 @@
     "wrench": "^1.5.8"
   },
   "devDependencies": {
-    "tape": "^2.13.1"
+    "tape": "^2.13.1",
+    "etcdjs": "^1.1.1"
   }
 }
