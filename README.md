@@ -1,7 +1,7 @@
 etcd-test-cluster
 -----------------
 
-Helper to boot 3 [etcd](http://github.com/coreos/etcd) servers so testing clusters is quick n easy
+Helper to boot multiple [etcd](http://github.com/coreos/etcd) servers so testing clusters is quick n easy
 
 ## install
 
