@@ -61,7 +61,7 @@ Cluster.prototype.opts = function(index){
   opts.name = opts.name + index
   opts.folder = opts.folder + '/node' + index
   opts.port = opts.basePort + index
-  opts.peerPort = opts.basePort + index
+  opts.peerPort = opts.basePeerPort + index
   if(index>0){
     opts.peers = '127.0.0.1:' + this.peerPort(index, 1) + ',127.0.0.1:' + this.peerPort(index, 2)
   }
@@ -79,6 +79,9 @@ Cluster.prototype.configs = function(){
 Cluster.prototype.start = function(done){
   var self = this;
   var serverConfigs = this.configs()
+  if(!fs.existsSync(opts.folder)){
+    wrench.mkdirSyncRecursive(opts.folder)
+  }
   async.forEachSeries(serverConfigs, function(config, next){
     var server = getServerProcess(config)
     self._servers['server' + config.index] = server
@@ -99,6 +102,7 @@ Cluster.prototype.stop = function(done){
 
 var defaults = {
   name:'etcdtestcluster',
+  folder:'/tmp/etcdtestcluster',
   basePort:4001,
   basePeerPort:7001,
   count:3
@@ -106,12 +110,6 @@ var defaults = {
 
 module.exports = function(opts){
   opts = opts || {}
-  if(!opts.folder){
-    opts.folder = '/tmp/etcdtestcluster'
-  }
-  if(!fs.existsSync(opts.folder)){
-    wrench.mkdirSyncRecursive(opts.folder)
-  }
   Object.keys(defaults || {}).forEach(function(key){
     if(!opts.hasOwnProperty(key)){
       opts[key] = defaults[key]
