@@ -87,42 +87,33 @@ Once the script has died
 
 ## api
 
-### `var cluster = etcdquick(opts)`
+### `var cluster = etcdcluster(opts)`
 
 Create a new cluster of etcd processes each with incrementing ports.
 
 Options are:
 
- * name - the base name to use for the nodes in the cluster (e.g. node = node1 - node2 and node3)
- * 
+ * name - the base name to use for the nodes in the cluster (etcdtestcluster)
+ * count - the number of etcd servers to run in the cluster (3)
+ * basePort - the starting port (4001)
+ * basePeerPort - the starting peer port (7001)
+ * folder - the folder to save data in (/tmp/etcdtestcluster)
 
-### `var node = locker(path)`
+### `cluster.start(done)`
 
-Create a node that represents a single key - other machines will have created nodes on the same path - they are all essentially competing.
+Start the cluster
 
-### `var id = node.id()`
+### `cluster.stop(done)`
 
-Each node uses it's id to determine election - this means you can create nodes on different machines but with the same 'value' passed to the constructor.
+Stop the cluster
 
-### `node.write(value)`
+### `cluster.configs()`
 
-Write a value to a node - if the node was previously elected this will trigger a new election essentially resetting the lock before applying the new value.
+Get the array of configs used to start the cluster
 
-### `node.reset()`
+### `cluster.addr(index)`
 
-Remove the node from the lock - this essentially resets the node and awaits another call to 'write' before joining the election again.
-
-### `node.on('change', function(value, nodeid){})
-
-This event is triggered when the lock value has changed regardless of which node was elected.
-
-The nodeid is of the elected machine is passed as the second argument.
-
-### `node.on('select', function(value){})
-
-This event is triggered when the node has been elected and it's value distributed to the cluster.
-
-You can run logic in this function that should only be running on one server at a time.
+Get the etcd client connection string for a single server
 
 ## license
 
