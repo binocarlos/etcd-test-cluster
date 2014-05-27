@@ -1,6 +1,6 @@
 {
   "name": "etcd-test-cluster",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "description": "Helper to boot 3 etcd servers so testing clusters is quick n easy",
   "main": "index.js",
   "scripts": {
