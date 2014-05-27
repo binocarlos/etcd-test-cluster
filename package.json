@@ -1,0 +1,31 @@
+{
+  "name": "etcd-test-cluster",
+  "version": "0.0.0",
+  "description": "Helper to boot 3 etcd servers so testing clusters is quick n easy",
+  "main": "index.js",
+  "scripts": {
+    "test": "node test.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/binocarlos/etcd-test-cluster.git"
+  },
+  "keywords": [
+    "etcd",
+    "test",
+    "cluster"
+  ],
+  "author": "Kai Davenport",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/binocarlos/etcd-test-cluster/issues"
+  },
+  "homepage": "https://github.com/binocarlos/etcd-test-cluster",
+  "dependencies": {
+    "async": "^0.9.0",
+    "wrench": "^1.5.8"
+  },
+  "devDependencies": {
+    "tape": "^2.13.1"
+  }
+}
