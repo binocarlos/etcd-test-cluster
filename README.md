@@ -98,6 +98,7 @@ Options are:
  * basePort - the starting port (4001)
  * basePeerPort - the starting peer port (7001)
  * folder - the folder to save data in (/tmp/etcdtestcluster)
+ * verbose - whether to pipe the etcd logs to stdout (false)
 
 ### `cluster.start(done)`
 

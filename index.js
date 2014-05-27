@@ -28,7 +28,7 @@ function getServerArgs(opts){
 function getServerProcess(opts){
   var args = getServerArgs(opts)
   return spawn('etcd', args, {
-    stdio:'inherit'
+    stdio:opts.verbose ? 'inherit' : 'pipe'
   })
 }
 
