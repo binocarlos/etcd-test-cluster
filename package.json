@@ -22,11 +22,7 @@
   },
   "homepage": "https://github.com/binocarlos/etcd-test-cluster",
   "dependencies": {
-    "async": "^0.9.0",
-    "wrench": "^1.5.8"
+    "minimist": "^0.2.0"
   },
-  "devDependencies": {
-    "tape": "^2.13.1",
-    "etcdjs": "^1.1.1"
-  }
+  "devDependencies": {}
 }
