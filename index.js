@@ -48,6 +48,10 @@ var commands = {
   stop:commandStop
 }
 
+console.log('-------------------------------------------');
+console.dir(args)
+process.exit()
+
 var command = args._[2] || 'start'
 
 commands[command]()
