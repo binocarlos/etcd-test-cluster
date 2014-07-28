@@ -19,7 +19,7 @@ function checkArg(name){
 }
 
 function resetVolumes(){
-  return 'rm -rf ' + volumes
+  return 'sudo rm -rf ' + volumes
 }
 
 function createVolume(count){
