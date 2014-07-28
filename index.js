@@ -1,11 +1,15 @@
 var args = require('minimist')(process.argv, {
   alias:{
-    address:'a'
+    address:'a',
+    token:'t'
   },
   default:{
     
   }
 })
+
+var path = require('path')
+var volumes = '/tmp/etcd-test-cluster'
 
 function checkArg(name){
   if(!args[name]){
@@ -14,8 +18,28 @@ function checkArg(name){
   }    
 }
 
+function resetVolumes(){
+  return 'rm -rf ' + volumes
+}
+
+function createVolume(count){
+  return 'mkdir -p ' + path.join(volumes, '/node' + count) 
+}
+
 function runSmesh(count){
-  return '$(docker run --rm binocarlos/smesh start --token $ETCD_TEST_CLUSTER_TOKEN --name etcdtest' + count + ' --hostname etcdtest' + count + ' --address ' + args.address + ')'
+  var port = 4000 + count
+  var peerport = 7000 + count
+  var volume = path.join(volumes, '/node' + count) + ':/data/etcd'
+  return 'eval $(docker run --rm binocarlos/smesh start --token ' + args.token + ' --name etcdtest' + count + ' --hostname etcdtest' + count + ' --address ' + args.address + ' --port ' + port + ' --peerport ' + peerport + ' --volume ' + volume + ')'
+}
+
+function getConnectionString(){
+  var strings = [
+    args.address + ':4001',
+    args.address + ':4002',
+    args.address + ':4003'
+  ]
+  return strings.join(',')
 }
 
 function stopSmesh(count){
@@ -23,14 +47,18 @@ function stopSmesh(count){
 }
 
 function commandStart(){
+  checkArg('token')
+  checkArg('address')
   var commands = []
-
-  commands.push('export ETCD_TEST_CLUSTER_TOKEN=$(docker run --rm binocarlos/smesh token)')
+  commands.push(resetVolumes())
+  commands.push(createVolume(1))
   commands.push(runSmesh(1))
+  commands.push(createVolume(2))
   commands.push(runSmesh(2))
+  commands.push(createVolume(3))
   commands.push(runSmesh(3))
-  
-  console.log(commands.join(' && '))
+  commands.push('echo "' + getConnectionString() + '"')
+  console.log('eval ' + commands.join(' && '))
 }
 
 function commandStop(){
@@ -40,17 +68,13 @@ function commandStop(){
   commands.push(stopSmesh(2))
   commands.push(stopSmesh(3))
   
-  console.log(commands.join(' && '))
+  console.log('eval ' + commands.join(' && '))
 }
 
 var commands = {
   start:commandStart,
   stop:commandStop
 }
-
-console.log('-------------------------------------------');
-console.dir(args)
-process.exit()
 
 var command = args._[2] || 'start'
 

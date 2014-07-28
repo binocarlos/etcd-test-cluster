@@ -17,17 +17,24 @@ $ docker pull binocarlos/etcd-test-cluster
 
 ## usage
 
+First generate a token:
+
+```bash
+$ TOKEN=$(docker run --rm binocarlos/smesh token)
+```
+
 Start a 3 node cluster:
 
-```
-$ $(docker run --rm binocarlos/etcd-test-cluster start)
+```bash
+$ $(docker run --rm binocarlos/etcd-test-cluster start --token $TOKEN --address 192.168.8.120)
 ```
 
-Get the etcd connection string for clients to use:
+This will print the 3 container ids and the client connection string
 
-```
-$ export ETCD_CLUSTER=`docker run --rm binocarlos/etcd-test-cluster connect`
-$ echo $ETCD_CLUSTER
+To stop the cluster:
+
+```bash
+$ $(docker run --rm binocarlos/etcd-test-cluster stop)
 ```
 
 ## license
