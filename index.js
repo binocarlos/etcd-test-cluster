@@ -1,7 +1,9 @@
 var args = require('minimist')(process.argv, {
   alias:{
+    node:'n',
     address:'a',
-    token:'t'
+    peers:'p',
+    hostname:'h'
   },
   default:{
     
@@ -10,6 +12,17 @@ var args = require('minimist')(process.argv, {
 
 var path = require('path')
 var volumes = '/tmp/etcd-test-cluster'
+var addresses = {
+  '1':'192.168.8.120',
+  '2':'192.168.8.121',
+  '3':'192.168.8.122'
+}
+
+var peers = {
+  '1':'boot',
+  '2':'192.168.8.120:7001',
+  '3':'192.168.8.120:7001'
+}
 
 function checkArg(name){
   if(!args[name]){
@@ -19,63 +32,24 @@ function checkArg(name){
 }
 
 function resetVolumes(){
-  return 'sudo rm -rf ' + volumes
-}
-
-function createVolume(count){
-  return 'mkdir -p ' + path.join(volumes, '/node' + count) 
+  return 'sudo rm -rf ' + volumes + ' && mkdir -p ' + volumes
 }
 
 function runSmesh(count){
-  var port = 4000 + count
-  var peerport = 7000 + count
-  var volume = path.join(volumes, '/node' + count) + ':/data/etcd'
-  return 'eval $(docker run --rm binocarlos/smesh start --token ' + args.token + ' --name etcdtest' + count + ' --hostname etcdtest' + count + ' --address ' + args.address + ' --port ' + port + ' --peerport ' + peerport + ' --volume ' + volume + ')'
-}
-
-function getConnectionString(){
-  var strings = [
-    args.address + ':4001',
-    args.address + ':4002',
-    args.address + ':4003'
-  ]
-  return strings.join(',')
-}
-
-function stopSmesh(count){
-  return 'docker stop etcdtest' + count + ' && docker rm etcdtest' + count
+  var name = 'etcdtest' + count
+  var addresslist = args.address || addresses[count]
+  var peerlist = args.peers || peers[count]
+  var volume = volumes + ':/data/etcd'
+  var hostname = args.hostname || 'etcdtest' + count
+  return 'eval $(docker run --rm binocarlos/smesh start --hostname ' + hostname + ' --address ' + addresslist + ' --volume ' + volume + ' --peers ' + peerlist + ')'
 }
 
 function commandStart(){
-  checkArg('token')
-  checkArg('address')
+  checkArg('node')
   var commands = []
   commands.push(resetVolumes())
-  commands.push(createVolume(1))
-  commands.push(runSmesh(1))
-  commands.push(createVolume(2))
-  commands.push(runSmesh(2))
-  commands.push(createVolume(3))
-  commands.push(runSmesh(3))
-  commands.push('echo "' + getConnectionString() + '"')
+  commands.push(runSmesh(args.node))
   console.log('eval ' + commands.join(' && '))
 }
 
-function commandStop(){
-  var commands = []
-
-  commands.push(stopSmesh(1))
-  commands.push(stopSmesh(2))
-  commands.push(stopSmesh(3))
-  
-  console.log('eval ' + commands.join(' && '))
-}
-
-var commands = {
-  start:commandStart,
-  stop:commandStop
-}
-
-var command = args._[2] || 'start'
-
-commands[command]()
+commandStart()

@@ -1,7 +1,7 @@
 etcd-test-cluster
 -----------------
 
-Boot a cluster of 3 etcd machines using [smesh](https://github.com/binocarlos/smesh)
+An opinionated setup of etcd across 3 servers
 
 ## install
 
@@ -17,24 +17,20 @@ $ docker pull binocarlos/etcd-test-cluster
 
 ## usage
 
-First generate a token:
-
 ```bash
-$ TOKEN=$(docker run --rm binocarlos/smesh token)
+node1:~$ $(docker run --rm binocarlos/etcd-test-cluster start --node 1)
 ```
 
-Start a 3 node cluster:
-
 ```bash
-$ $(docker run --rm binocarlos/etcd-test-cluster start --token $TOKEN --address 192.168.8.120)
+node2:~$ $(docker run --rm binocarlos/etcd-test-cluster start --node 2)
 ```
 
-This will print the 3 container ids and the client connection string
-
-To stop the cluster:
+```bash
+node3:~$ $(docker run --rm binocarlos/etcd-test-cluster start --node 3)
+```
 
 ```bash
-$ $(docker run --rm binocarlos/etcd-test-cluster stop)
+$ docker stop smesh && docker rm smesh
 ```
 
 ## license
